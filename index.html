@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#16130F">
+<title>MOJA Jersey Try-On</title>
+<meta name="description" content="Try the MOJA Jersey Hijab on live with your front camera.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+  "@mediapipe/tasks-vision": "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs"
+} }
+</script>
+<style>
+:root {
+  --ink: #16130f; --cream: #f6f1ea; --muted: #b9ada0; --accent: #c8b49c;
+  --panel: rgba(22, 19, 15, 0.8);
+  --sb: env(safe-area-inset-bottom, 0px); --st: env(safe-area-inset-top, 0px);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--ink); color: var(--cream); overflow: hidden; }
+body { font: 15px/1.45 Inter, system-ui, -apple-system, sans-serif; overscroll-behavior: none; }
+button, input { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+#stage { position: fixed; inset: 0; transform: scaleX(-1); background: #0e0c0a; }
+#stage video, #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.topbar { position: fixed; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center;
+  padding: calc(14px + var(--st)) max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px));
+  background: linear-gradient(rgba(0,0,0,.5), transparent); z-index: 5; }
+.brand { display: flex; flex-direction: column; line-height: 1.05; }
+.wordmark { font: 600 26px/1 "Cormorant Garamond", Georgia, serif; letter-spacing: .32em; }
+.sub { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+.icon-btn { background: rgba(255,255,255,.14); border: 0; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; }
+.icon-btn:focus-visible, .primary:focus-visible, .swatch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.panel { position: fixed; left: 16px; right: 16px; bottom: calc(18px + var(--sb)); z-index: 6;
+  background: var(--panel); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-radius: 22px; padding: 22px 20px 20px; max-width: 460px; margin: 0 auto; }
+.eyebrow { margin: 0 0 6px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+h1, h2 { font: 600 30px/1.08 "Cormorant Garamond", Georgia, serif; margin: 0 0 8px; text-wrap: balance; }
+h2 { font-size: 24px; }
+.lede { margin: 0 0 14px; color: #e6ddd2; }
+.tips { margin: 0 0 18px; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+.tips li::before { content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin: 0 10px 2px 2px; }
+.primary { display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 52px; border: 0; border-radius: 26px;
+  background: var(--cream); color: var(--ink); font-weight: 600; text-decoration: none; cursor: pointer; }
+.primary:disabled { opacity: .55; cursor: progress; }
+.note { font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+
+#status { position: fixed; left: 50%; top: calc(86px + var(--st)); transform: translateX(-50%); z-index: 5;
+  background: rgba(0,0,0,.62); padding: 9px 16px; border-radius: 18px; font-size: 13px; white-space: nowrap; }
+
+#controls { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 12px 0 calc(10px + var(--sb));
+  background: linear-gradient(transparent, rgba(0,0,0,.65) 34%); }
+.shade-name { display: flex; justify-content: center; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+#shade-label { font: 600 22px/1 "Cormorant Garamond", Georgia, serif; }
+.shade-hint { font-size: 11px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.shades { display: flex; gap: 12px; overflow-x: auto; padding: 6px max(16px, env(safe-area-inset-left, 0px)) 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+.shades::-webkit-scrollbar { display: none; }
+.swatch { flex: none; width: 46px; height: 46px; border-radius: 50%; border: 2px solid transparent; padding: 3px; background: transparent; scroll-snap-align: center; cursor: pointer; }
+.swatch i { display: block; width: 100%; height: 100%; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 2px 6px rgba(0,0,0,.35); }
+.swatch[aria-checked="true"] { border-color: var(--cream); }
+.actions { display: flex; gap: 12px; align-items: center; padding: 6px 20px 0; max-width: 520px; margin: 0 auto; }
+.shop { flex: 1; }
+
+#fit { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); top: calc(70px + var(--st)); z-index: 6; width: min(300px, calc(100vw - 32px));
+  background: var(--panel); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px; }
+#fit label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+#fit input[type=range] { width: 100%; accent-color: var(--accent); }
+#fit .row { display: flex; justify-content: space-between; gap: 8px; }
+#fit button { background: none; border: 1px solid rgba(255,255,255,.25); border-radius: 14px; padding: 6px 12px; font-size: 12px; cursor: pointer; }
+@media (min-width: 900px) { #stage video, #stage canvas { object-fit: contain; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div id="stage"><video id="video" playsinline muted></video><canvas id="gl"></canvas></div>
+
+<header class="topbar">
+  <div class="brand"><span class="wordmark">MOJA</span><span class="sub">Jersey Hijab · Try-On</span></div>
+  <button id="fit-toggle" class="icon-btn" aria-label="Adjust fit" aria-expanded="false" hidden>
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="16" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+  </button>
+</header>
+
+<section id="intro" class="panel">
+  <p class="eyebrow">Virtual try-on · test version</p>
+  <h1>See MOJA Jersey on you</h1>
+  <p class="lede">Pick a shade and turn your head. The hijab follows you live through your front camera.</p>
+  <ul class="tips">
+    <li>Face a window or soft light</li>
+    <li>Pull hair back, hold the phone at eye level</li>
+    <li>Video stays on your phone. Nothing is uploaded.</li>
+  </ul>
+  <button id="start" class="primary" type="button">Start try-on</button>
+  <p class="note">First start downloads about 8 MB of face-tracking files.</p>
+</section>
+
+<section id="message" class="panel" hidden>
+  <h2 id="msg-title"></h2>
+  <p id="msg-body" class="lede"></p>
+  <button id="msg-action" class="primary" type="button" hidden></button>
+</section>
+
+<div id="status" hidden></div>
+
+<div id="fit" hidden>
+  <label for="fit-y">Up / down <input id="fit-y" type="range" min="-3" max="3" step="0.1" value="0"></label>
+  <label for="fit-z">Back / forward <input id="fit-z" type="range" min="-3" max="3" step="0.1" value="0"></label>
+  <label for="fit-s">Size <input id="fit-s" type="range" min="0.85" max="1.15" step="0.01" value="1"></label>
+  <div class="row"><button id="fit-reset" type="button">Reset</button><button id="fit-close" type="button">Done</button></div>
+</div>
+
+<section id="controls" hidden>
+  <div class="shade-name"><span id="shade-label"></span><span class="shade-hint">Tap a shade</span></div>
+  <div id="shades" class="shades" role="radiogroup" aria-label="Hijab shade"></div>
+  <div class="actions">
+    <a id="shop" class="primary shop" href="#" target="_blank" rel="noopener">Shop this shade</a>
+  </div>
+</section>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

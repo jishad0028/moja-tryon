@@ -1,0 +1,20 @@
+{
+  "_readme": "Single source of truth for try-on shades. The web app sends `hex` to the Lens as a launch param, so adding or correcting a shade never needs a Lens rebuild. hexVerified=false means the value is an estimate from the shade name — replace it with a pixel-sampled value from the real swatch photo (same method as the Modal Cotton hex table) and set hexVerified=true.",
+  "product": "MOJA Jersey Hijab (Turkey Bamboo Jersey)",
+  "style": "classic-pinned-drape",
+  "defaultShade": "black",
+  "shades": [
+    { "id": "black",       "name": "Black",       "hex": "#1C1B1E", "hexVerified": false, "url": "https://www.lauraveils.com/product/black-moja-premium-jersey-hijab/" },
+    { "id": "milk-white",  "name": "Milk White",  "hex": "#ECEAE3", "hexVerified": false, "url": "https://www.lauraveils.com/product/milk-white-moja-premium-jersey-hijab/" },
+    { "id": "taupe",       "name": "Taupe",       "hex": "#8C7D72", "hexVerified": false, "url": "https://www.lauraveils.com/product/taupe-moja-premium-jersey-hijab/" },
+    { "id": "mushroom",    "name": "Mushroom",    "hex": "#A69788", "hexVerified": false, "url": "https://www.lauraveils.com/product/mushroom-moja-premium-jersey-hijab/" },
+    { "id": "sand",        "name": "Sand",        "hex": "#C3AE92", "hexVerified": false, "url": "https://www.lauraveils.com/product/sand-moja-premium-jersey-hijab/" },
+    { "id": "cacao",       "name": "Cacao",       "hex": "#5B4034", "hexVerified": false, "url": "https://www.lauraveils.com/product/cacao-moja-premium-jersey-hijab/" },
+    { "id": "wine",        "name": "Wine",        "hex": "#5B2A3D", "hexVerified": false, "url": "https://www.lauraveils.com/product/wine-moja-premium-jersey-hijab/" },
+    { "id": "nude-pink",   "name": "Nude Pink",   "hex": "#B39488", "hexVerified": false, "url": "https://www.lauraveils.com/product/nude-pink-moja-premium-jersey-hijab/" },
+    { "id": "opera-mauve", "name": "Opera Mauve", "hex": "#BF9FA2", "hexVerified": false, "url": "https://www.lauraveils.com/product/opera-mauve-moja-premium-jersey-hijab/" },
+    { "id": "moss-green",  "name": "Moss Green",  "hex": "#69694C", "hexVerified": false, "url": "https://www.lauraveils.com/product/moss-green-moja-premium-jersey-hijab/" },
+    { "id": "denim",       "name": "Denim",       "hex": "#4E5F74", "hexVerified": false, "url": "https://www.lauraveils.com/product/denim-moja-premium-jersey-hijab/" },
+    { "id": "navy-blue",   "name": "Navy Blue",   "hex": "#262C3D", "hexVerified": false, "url": "https://www.lauraveils.com/product/navy-blue-moja-jersey-hijab-2m-length/" }
+  ]
+}
